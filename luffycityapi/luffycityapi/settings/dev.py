@@ -181,3 +181,10 @@ LOGGING = {
         },
     }
 }
+
+#drf配置
+
+REST_FRAMEWORK = {
+    #自定义异常处理
+    'EXCEPTION_HANDLER': 'luffycityapi.utils.exceptions.custom_exception_handler',
+}
