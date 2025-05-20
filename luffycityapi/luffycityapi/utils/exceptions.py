@@ -1,5 +1,6 @@
 from rest_framework.views import exception_handler, APIView
 from django.db import DatabaseError
+from redis import RedisError
 
 from rest_framework.response import Response
 from rest_framework import status
@@ -25,7 +26,12 @@ def custom_exception_handler(exc, context):
         #判断是否发生数据库异常
         if isinstance(exc,DatabaseError):
 
-            logging.error('[%s] %s' %(view,exc))
+            logging.error('mysql数据库异常错误:[%s] %s' %(view,exc))
             response = Response({'message': '服务器内部错误'},status=status.HTTP_507_INSUFFICIENT_STORAGE)
+
+        if isinstance(exc,RedisError):
+            logging.error('redis数据库异常错误:[%s] %s' %(view,exc))
+            response = Response({'message': '服务器内部错误'},status=status.HTTP_507_INSUFFICIENT_STORAGE)
+
 
     return response
