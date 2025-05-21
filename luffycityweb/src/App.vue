@@ -1,47 +1,37 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
-</script>
-
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-    </div>
-  </header>
-
-  <main>
-    <TheWelcome />
-  </main>
+<router-view></router-view>
+<!--  <div>test</div>-->
 </template>
 
+
+<script setup>
+
+</script>
+
+
 <style scoped>
-header {
-  line-height: 1.5;
+/* 声明全局样式和项目的初始化样式 */
+body,h1,h2,h3,h4,p,table,tr,td,ul,li,a,form,input,select,option,textarea{
+  margin:0;
+  padding: 0;
+  font-size: 15px;
 }
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
+a{
+  text-decoration: none;
+  color: #333;
+  cursor: pointer;
 }
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
+ul,li{
+  list-style: none;
+}
+table{
+  border-collapse: collapse; /* 合并边框 */
+}
+img{
+  max-width: 100%;
+  max-height: 100%;
+}
+input{
+  outline: none;
 }
 </style>
