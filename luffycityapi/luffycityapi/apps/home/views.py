@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 #对日志调用
-import logging
+import loggin
 logger=logging.getLogger('django')
 
 # Create your views here.
