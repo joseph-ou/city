@@ -1,13 +1,18 @@
-
-
 <template>
-  <h1>首页</h1>
-  <el-button>sss</el-button>
 
+    <div class="home">
+      <Header></Header>
+
+
+      <Footer></Footer>
+    </div>
 </template>
 
 <script setup>
 import {reactive} from 'vue';
+import Header from  '../components/Header.vue'
+import Footer from  '../components/Footer.vue'
+
 
     const store=reactive({
       value2:null,
