@@ -30,7 +30,7 @@ SECRET_KEY = "django-insecure-w+#@9t)ran#0t6uj@%&8)h!#jmm2ha0ntf%h-vt+6u0v2-uma^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -42,12 +42,16 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
     'rest_framework',
+    'corsheaders', # cors跨域子应用
+
     'home',
 
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  # cors跨域的中间件
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -56,6 +60,14 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+# CORS的配置信息:
+# 方案1：
+# CORS_ORIGIN_WHITELIST = (
+#     'http://www.luffycity.cn:3000',
+# )
+# CORS_ALLOW_CREDENTIALS = False  # 不允许ajax跨域请求时携带cookie
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = "luffycityapi.urls"
 
