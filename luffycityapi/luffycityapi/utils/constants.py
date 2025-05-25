@@ -1,0 +1,6 @@
+'''一般用到的常量配置'''
+#导航位置对应数字 和 导航条显示大小
+NAV_HEADER_POSITION=0
+NAV_FOOTER_POSITION=1
+NAV_HEADER_SIZE=5
+NAV_FOOTER_SIZE=10

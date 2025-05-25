@@ -5,6 +5,13 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
+from rest_framework.generics import ListAPIView
+from .models import Nav
+from .serializers import NavModelSerializer
+
+#常量配置
+import constants
+
 #对日志调用
 import logging
 logger=logging.getLogger('django')
@@ -24,3 +31,14 @@ class HomeView(APIView):
 
         message='csndm'
         return Response({"message": user,'status':status.HTTP_200_OK})
+
+
+class NavHeaderView(ListAPIView):
+    '''顶部导航视图'''
+    queryset = Nav.objects.filter(position=constants.NAV_HEADER_POSITION,is_show=True,is_deleted=False).order_by('orders','-id')[:constants.NAV_HEADER_SIZE]
+    serializer_class = NavModelSerializer
+
+class NavFooterView(ListAPIView):
+    '''底部导航视图'''
+    queryset = Nav.objects.filter(position=constants.NAV_FOOTER_POSITION,is_show=True,is_deleted=False).order_by('orders','-id')[:constants.NAV_FOOTER_SIZE]
+    serializer_class = NavModelSerializer
