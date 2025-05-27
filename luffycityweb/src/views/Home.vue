@@ -2,7 +2,9 @@
 
     <div class="home">
       <Header></Header>
-
+        <div class="main">
+          <banner></banner>
+        </div>
 
       <Footer></Footer>
     </div>
@@ -12,6 +14,7 @@
 import {reactive} from 'vue';
 import Header from  '../components/Header.vue'
 import Footer from  '../components/Footer.vue'
+import banner from  '../components/banner.vue'
 
 
 //测试cors的跨域配置是否有问题
