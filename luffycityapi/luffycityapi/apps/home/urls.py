@@ -6,5 +6,6 @@ urlpatterns = [
     # path('test', views.HomeView.as_view(), name='home'),
     path('nav/header/', views.NavHeaderView.as_view(), name='Nav_Header'),
     path('nav/footer/', views.NavFooterView.as_view(), name='Nav_Footer'),
+    path('banner/', views.BannerView.as_view(), name='Banner'),
 
 ]
