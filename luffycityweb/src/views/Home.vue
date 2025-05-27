@@ -23,10 +23,11 @@ import Footer from  '../components/Footer.vue'
 //   console.log(res.data)
 // })
 
-import http from '../utils/http.js'
-http.get('/home/test').then(res=>{
-  console.log(res.data)
-})
+//引入http.js进行axios方法
+// import http from '../utils/http.js'
+// http.get('/home/test').then(res=>{
+//   console.log(res.data)
+// })
 
 
     const store=reactive({
