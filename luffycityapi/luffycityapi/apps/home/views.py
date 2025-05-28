@@ -1,11 +1,14 @@
 # from django.shortcuts import render
 from django_redis import get_redis_connection
 from rest_framework import status
+
 #res_framework
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from rest_framework.generics import ListAPIView
+# from rest_framework.generics import ListAPIView
+from views import CacheListAPIView #经过缓存处理的视图类
+
 from .models import Nav, Banner
 from .serializers import NavModelSerializer, BannerModelSerializer
 
@@ -33,18 +36,18 @@ class HomeView(APIView):
         return Response({"message": user,'status':status.HTTP_200_OK})
 
 
-class NavHeaderView(ListAPIView):
+class NavHeaderView(CacheListAPIView):
     '''顶部导航视图'''
     queryset = Nav.objects.filter(position=constants.NAV_HEADER_POSITION,is_show=True,is_deleted=False).order_by('orders','-id')[:constants.NAV_HEADER_SIZE]
     serializer_class = NavModelSerializer
 
-class NavFooterView(ListAPIView):
+class NavFooterView(CacheListAPIView):
     '''底部导航视图'''
     queryset = Nav.objects.filter(position=constants.NAV_FOOTER_POSITION,is_show=True,is_deleted=False).order_by('orders','-id')[:constants.NAV_FOOTER_SIZE]
     serializer_class = NavModelSerializer
 
 
-class BannerView(ListAPIView):
+class BannerView(CacheListAPIView):
     '''轮播图视图'''
 
     queryset = Banner.objects.filter(is_show=True, is_deleted=False).order_by('orders','-id')[:constants.BANNER_SIZE]
