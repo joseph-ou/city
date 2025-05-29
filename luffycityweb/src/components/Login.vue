@@ -34,6 +34,7 @@ const state = reactive({
   login_type: 0,
   username:"",
   password:"",
+
 })
 </script>
 

@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders', # cors跨域子应用
     'home',
+    'users',
 
 ]
 
@@ -273,3 +274,6 @@ REST_FRAMEWORK = {
     #自定义异常处理
     'EXCEPTION_HANDLER': 'luffycityapi.utils.exceptions.custom_exception_handler',
 }
+
+#自定义用户模型  AUTH_USER_MODEL='子应用目录名,模型名'
+AUTH_USER_MODEL = 'users.User'
