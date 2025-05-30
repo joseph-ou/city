@@ -7,7 +7,7 @@ const routes=[
         title: "luffy2.0-站点首页",
         keepAlive: true
     },
-    path: '/',         // uri访问地址
+    path: '/',         // uri访问地址s
     name: "Home",
     component: ()=> import("../views/Home.vue")
   },

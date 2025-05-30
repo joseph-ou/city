@@ -4,7 +4,7 @@
 		<div class="login">
 			<div class="login-title">
 				<img src="../assets/logo.svg" alt="">
-				<p>帮助有志向的年轻人通过努力学习获得体面的工作和生活!</p>
+				<p>登录界面</p>
 			</div>
       <div class="login_box">
           <Login></Login>
