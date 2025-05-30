@@ -269,10 +269,34 @@ LOGGING = {
     }
 }
 
-#drf配置
+# drf配置
 REST_FRAMEWORK = {
-    #自定义异常处理
-    'EXCEPTION_HANDLER': 'luffycityapi.utils.exceptions.custom_exception_handler',
+    # 自定义异常处理
+    'EXCEPTION_HANDLER': 'luffycityapi.utils.exceptions.exception_handler',
+    # 自定义认证
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        # 'rest_framework_simplejwt.authentication.JSONWebTokenAuthentication',  # jwt认证 已弃用
+        'rest_framework_simplejwt.authentication.JWTAuthentication',  # 使用 simplejwt 认证
+        'rest_framework.authentication.SessionAuthentication',           # session认证
+        'rest_framework.authentication.BasicAuthentication',
+    ),
+}
+
+# import datetime
+# # jwt认证相关配置项 #已经被放弃使用
+# JWT_AUTH = {
+#     # 设置jwt的有效期
+#     # 如果内部站点，例如：运维开发系统，OA，往往配置的access_token有效期基本就是15分钟，30分钟，1~2个小时
+#     'JWT_EXPIRATION_DELTA': datetime.timedelta(weeks=1), # 一周有效，
+# }
+
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    # 设置 access token 的有效期
+    'ACCESS_TOKEN_LIFETIME': timedelta(weeks=1),  # 对应原来的 JWT_EXPIRATION_DELTA
+    # 设置 refresh token 的有效期（可选，默认为 1 天）
+    'REFRESH_TOKEN_LIFETIME': timedelta(weeks=2),  # 可根据需求调整
 }
 
 #自定义用户模型  AUTH_USER_MODEL='子应用目录名,模型名'
