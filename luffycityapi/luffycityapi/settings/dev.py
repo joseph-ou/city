@@ -297,6 +297,12 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(weeks=1),  # 对应原来的 JWT_EXPIRATION_DELTA
     # 设置 refresh token 的有效期（可选，默认为 1 天）
     'REFRESH_TOKEN_LIFETIME': timedelta(weeks=2),  # 可根据需求调整
+    #
+
+    'USER_ID_FIELD': 'id',  # 数据库中的用户 ID 字段
+    'USER_ID_CLAIM': 'user_id',  # payload 中的字段名（我们会移除）
+    'TOKEN_OBTAIN_SERIALIZER': 'users.serializers.CustomTokenObtainPairSerializer',
+
 }
 
 #自定义用户模型  AUTH_USER_MODEL='子应用目录名,模型名'
