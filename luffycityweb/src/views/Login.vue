@@ -7,7 +7,7 @@
 				<p>登录界面</p>
 			</div>
       <div class="login_box">
-          <Login></Login>
+          <Login @successhandle="login_success"></Login>
       </div>
 		</div>
 	</div>
@@ -15,6 +15,12 @@
 
 <script setup>
 import Login from "../components/Login.vue"
+import router from "@/router/index.js";
+
+const login_success=()=>{
+  //登录成功后进行跳转
+  router.push('/')
+}
 
 </script>
 

@@ -42,7 +42,7 @@
 
 <!--登录弹出框-->
   <el-dialog :width="600" v-model="state.show_login">
-      <Login></Login>
+      <Login @successhandle="login_success"></Login>
   </el-dialog>
 </template>
 
@@ -64,6 +64,14 @@ nav.get_header_nav().then(res=>{
 }).catch(err => {
 
 })
+
+//用户登录成功后
+const login_success=(token)=>{
+  //登录成功后关闭弹窗
+  state.show_login=false
+}
+
+
 
 </script>
 

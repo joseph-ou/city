@@ -32,6 +32,9 @@ import {reactive} from "vue";
 import user from '../api/user.js'
 import {ElMessage} from "element-plus";//发送提示框
 
+// 用 const emit = defineEmits(['事件名']) 定义子组件可能触发的事件
+const emit = defineEmits(["successhandle",])
+
 //前端进行提交验证
 const loginhandeler=()=>{
   if(user.username.length<1 || user.password.length<1){
@@ -58,6 +61,18 @@ const loginhandeler=()=>{
 
     console.log(res.data.access)
     ElMessage.success('登录成功 跳转中')
+
+    //关闭弹窗 并且使用emit通知父组建关闭登录弹窗 或者跳转
+    //emit 有两种写法：
+    // Options API：用 this.$emit('事件名', 数据)。
+    // Composition API（<script setup>）：用 defineEmits 定义事件，再用 emit('事件名', 数据)。
+    user.username='';
+    user.login_type=0;
+    user.password='';
+    user.code='';
+    user.remember=false;
+    emit('successhandle')
+
 
   }).catch(err => {
     ElMessage.error(err)

@@ -5,7 +5,7 @@ const user=reactive({
     login_type:0,//登录方式
     username:'',//登录账号/手机号/邮箱
     password:'',//密码
-    remember:'',//登录状态
+    remember:false,//登录状态
     mobile:'',//手机号
     code:'',//短信验证码
 
