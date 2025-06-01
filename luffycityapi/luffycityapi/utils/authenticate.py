@@ -2,8 +2,10 @@
 
 from rest_framework_jwt.utils import jwt_payload_handler as payload_handler
 
+from django.contrib.auth.backends import ModelBackend, UserModel #modelBackend是django默认自带认证 使用user模型
+from django.db.models import Q
 
-
+#旧版jwt 已经弃用 新的simplejwt在users/serializers
 def jwt_payload_handler(user):
     """
     自定义载荷信息
@@ -23,3 +25,48 @@ def jwt_payload_handler(user):
         payload['credit'] = user.credit
 
     return payload
+
+
+def get_user_by_account(account):
+    '''
+    根据发送过来的账户信息获取user模型对象
+    :param account:  账号信息，可以是用户名，也可以是手机号，甚至其他的可用于识别用户身份的字段信息
+    :return: user对象或者none
+    '''
+
+    #获取模型对象
+    user_object=UserModel.objects.filter(Q(mobile=account)|Q(username=account)|Q(email=account)).first()
+    return user_object
+
+
+class CustomAuthBackend(ModelBackend):
+    '''
+    自定义多条件登录
+    ：ModelBackend django内置的验证器为了实现多条件登录
+    '''
+
+    def authenticate(self, request,username=None,password=None,**kwargs):
+        """多条件认证方法
+        :param request: 本次客户端的http请求对象
+        :param username:  本次客户端提交的用户信息，可以是user，也可以mobile或其他唯一字段
+        :param password: 本次客户端提交的用户密码
+        :param kwargs: 额外参数
+        :return:"""
+
+        if username is None:
+            #如果username为None 则在客户端额外提交的项中找登录认证所需的字段
+            username=kwargs.get(UserModel.USERNAME_FIELD)#在自定义的user模型中 USERNAME_FIELD在自定义的usermodel默认为username 可以理解为在额外参数中提取username:'xxx'
+
+        if username is None or password is None:
+            #如果请求中没有username和password 则未通过
+            return
+
+        #如果是其他条件登录则根据用户名信息username获取账户对象
+
+        user=get_user_by_account(username)
+        #对密码进行认证 user_can_authenticate 检查is_active是否为1
+        if user and user.check_password(password) and self.user_can_authenticate(user):
+            return user
+
+
+

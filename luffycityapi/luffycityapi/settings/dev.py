@@ -280,6 +280,8 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',           # session认证
         'rest_framework.authentication.BasicAuthentication',
     ),
+
+
 }
 
 # import datetime
@@ -307,3 +309,6 @@ SIMPLE_JWT = {
 
 #自定义用户模型  AUTH_USER_MODEL='子应用目录名,模型名'
 AUTH_USER_MODEL = 'users.User'
+
+# django自定义认证 账号多条件登录用
+AUTHENTICATION_BACKENDS = ['luffycityapi.utils.authenticate.CustomAuthBackend', ]
