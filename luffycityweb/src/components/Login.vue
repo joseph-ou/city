@@ -28,12 +28,16 @@
 </template>
 
 <script setup>
+import {useStore} from "vuex";
 import {reactive} from "vue";
 import user from '../api/user.js'
 import {ElMessage} from "element-plus";//发送提示框
 
 // 用 const emit = defineEmits(['事件名']) 定义子组件可能触发的事件
 const emit = defineEmits(["successhandle",])
+
+//引入vuex的store记录登录信息
+const store=useStore()
 
 //前端进行提交验证
 const loginhandeler=()=>{
@@ -59,8 +63,14 @@ const loginhandeler=()=>{
     // 保存token，并根据用户的选择，是否记住密码
     // 成功提示
 
-    console.log(res.data.access)
+    // console.log(res.data.access)
     ElMessage.success('登录成功 跳转中')
+    // vuex存储用户登录信息，保存token，并根据用户的选择，是否记住密码
+    let payload = res.data.access.split(".")[1]  // 载荷
+    let payload_data = JSON.parse(atob(payload)) // 用户信息
+    console.log(payload_data)
+    store.commit("login", payload_data)
+
 
     //关闭弹窗 并且使用emit通知父组建关闭登录弹窗 或者跳转
     //emit 有两种写法：
@@ -72,7 +82,6 @@ const loginhandeler=()=>{
     user.code='';
     user.remember=false;
     emit('successhandle')
-
 
   }).catch(err => {
     ElMessage.error(err)
