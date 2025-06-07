@@ -9,9 +9,13 @@ const user=reactive({
     mobile:'',//手机号
     code:'',//短信验证码
 
-    login(){
+    login(res){
         //用户登录 发送axios请求
         return http.post('/users/login/',{
+            //验证码所需
+            "ticket": res.ticket,
+            "randstr": res.randstr,
+
             "username":this.username,
             "password":this.password,
         })
