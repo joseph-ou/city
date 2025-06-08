@@ -312,3 +312,4 @@ AUTH_USER_MODEL = 'users.User'
 
 # django自定义认证 账号多条件登录用
 AUTHENTICATION_BACKENDS = ['luffycityapi.utils.authenticate.CustomAuthBackend', ]
+
