@@ -13,12 +13,12 @@
         </div>
 
         <div class="inp">
-          <input type="text" v-model="state.mobile" placeholder="手机号" class="user">
-          <input type="password" v-model="state.password" placeholder="登录密码" class="user">
-          <input type="password" v-model="state.re_password" placeholder="确认密码" class="user">
-          <input type="code" v-model="state.code" placeholder="验证码" class="code">
+          <input type="text" v-model="user.mobile" placeholder="手机号" class="user">
+          <input type="password" v-model="user.password" placeholder="登录密码" class="user">
+          <input type="password" v-model="user.re_password" placeholder="确认密码" class="user">
+          <input type="code" v-model="user.code" placeholder="验证码" class="code">
           <el-button id="get_code" type="primary">获取验证码</el-button>
-          <button class="login_btn">注册</button>
+          <button class="login_btn" @click="show_captcha">注册</button>
 
           <p class="go_login">已有账号 <router-link to="/login">跳转至登录</router-link></p>
 
@@ -36,19 +36,104 @@
 
 <script setup>
 
-import {reactive, defineEmits} from "vue"
-import { ElMessage } from 'element-plus'
+import {reactive, defineEmits,watch} from "vue"
+
 import {useStore} from "vuex"
+import user from '@/api/user.js'
+import {ElMessage} from "element-plus";//发送提示框
+
 import "../utils/TCaptcha"
+import settings from "@/settings.js";
 
 const store=useStore()
 
-const state=reactive({
-  mobile:'',
-  password:'',
-  re_password:'',
-  code:'',
-})
+//引入user记录 效果如下
+// const state=reactive({
+//   mobile:'',
+//   password:'',
+//   re_password:'',
+//   code:'',
+// })
+
+// 监测手机号是否存在
+//前端检测手机号格式是否正确
+watch(()=>user.mobile,(mobile,prev_mobile)=>{
+  //第一个箭头函数代表watch检测的值，第二个是回调函数
+  if(/1[3-9]\d{9}/.test(user.mobile)){
+    //发送请求看手机号是否注册 test是正则匹配
+    user.check_mobile().then(res=>{
+      ElMessage.success('手机号可注册')
+    }).catch(err=>{
+      console.log(err)
+      ElMessage.error(err.response.data.msg);
+    })
+  }
+
+});
+
+// 显示登录验证码
+const show_captcha = ()=>{
+  // 直接生成一个验证码对象
+  let  captcha1 = new TencentCaptcha(settings.captcha_app_id, (res)=>{
+    // 验证码通过验证以后的回调方法
+    if(res && res.ret === 0){
+      // 验证通过，发送登录请求
+      registerhandler(res)
+    }
+  });
+
+  // 显示验证码
+  captcha1.show();
+}
+
+const registerhandler = (res)=> {
+  // 注册处理
+  if (!/^1[3-9]\d{9}$/.test(user.mobile)) {
+    // 错误提示
+    ElMessage.error('手机号格式不正确！');
+    return false // 阻止代码继续往下执行
+  }
+  if (user.password.length < 6 || user.password.length > 16) {
+    ElMessage.error('密码必须在6~16个字符之间！');
+    return false
+  }
+
+  if (user.password !== user.re_password) {
+    ElMessage.error('密码和确认密码不一致！');
+    return false
+  }
+
+    // 发送请求
+  user.register({
+    // 验证码通过的票据信息
+    ticket: res.ticket,
+    randstr: res.randstr,
+  }).then(response=>{
+    // 保存token，并根据用户的选择，是否记住密码
+    localStorage.removeItem("access");
+    sessionStorage.removeItem("access");
+
+    // 默认不需要记住登录
+    sessionStorage.access = response.data.access;
+
+    // vuex存储用户登录信息
+    let payload = response.data.access.split(".")[1]  // 载荷
+    let payload_data = JSON.parse(atob(payload)) // 用户信息
+    store.commit("login", payload_data)
+    // 清空表单信息
+    user.mobile = ""
+    user.password = ""
+    user.code = ""
+    user.remember = false
+    //  成功提示
+    ElMessage.success("注册成功！");
+    // 路由跳转到首页
+    router.push("/");
+
+
+  })
+}
+
 
 
 </script>

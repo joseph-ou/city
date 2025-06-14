@@ -11,3 +11,6 @@ BANNER_SIZE=5
 
 #页面缓存周期
 LIST_PAGE_CACHE_TIME=60*60*24
+
+#默认头像
+DEFAULT_USER_AVATAR='avatar/2025/avatar2.png'

@@ -33,7 +33,9 @@ import {reactive} from "vue";
 import user from '../api/user.js'//标准化登录用户信息并发送
 
 import '../utils/TCaptcha.js'
-import {ElMessage} from "element-plus";//发送提示框
+import {ElMessage} from "element-plus";
+import settings from "@/settings.js";
+//发送提示框
 
 // 用 const emit = defineEmits(['事件名']) 定义子组件可能触发的事件
 const emit = defineEmits(["successhandle",])
@@ -43,7 +45,7 @@ const store=useStore()
 
 //显示登录验证码
 const show_captcha=()=>{
-    var captcha1 = new TencentCaptcha('192768512', (res)=>{
+    var captcha1 = new TencentCaptcha(settings.captcha_app_id, (res)=>{
       // 接收验证结果的回调函数
       /* res（验证成功） = {ret: 0, ticket: "String", randstr: "String"}
          res（客户端出现异常错误 仍返回可用票据） = {ret: 0, ticket: "String", randstr: "String", errorCode: Number, errorMessage: "String"}

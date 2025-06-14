@@ -1,13 +1,18 @@
 from django.shortcuts import render
 
+
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .serializers import CustomTokenObtainPairSerializer
 
+from rest_framework.views import APIView
+from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView, UpdateAPIView
 from rest_framework.response import Response
 from rest_framework import status
 #腾讯验证码
 from luffycityapi.utils.tencentcloudapi import TencentCloudAPI,TencentCloudSDKException
 
+from .models import User #获取自定义的user模型
+from .serializers import UserRegisterSerializer
 
 # Create your views here.
 
@@ -36,3 +41,46 @@ class CustomTokenObtainPairView(TokenObtainPairView):
                 raise TencentCloudSDKException
         except TencentCloudSDKException as err:
             return Response({"errmsg": "验证码校验失败！"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+#手机号注册验证
+class MobileRegisterCheckAPIView(APIView):
+
+    def get(self,request,mobile):
+        # 获取手机号注册信息
+        #因为是get请求从url获取字段所以mobile直接引入
+
+        try:
+            User.objects.get(mobile=mobile)
+            return Response({"msg": "当前手机号已注册"}, status=status.HTTP_400_BAD_REQUEST)
+
+        except User.DoesNotExist:
+        # 如果查不到该手机号的注册记录，则证明手机号可以注册使用
+            return Response({"msg": "注册状态：ok"}, status=status.HTTP_200_OK)
+
+
+class UserRegisterAPIView(APIView):
+    '''完整写法'''
+    def post(self,request,*args,**kwargs):
+        serializer = UserRegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# class UserRegisterAPIView(CreateAPIView):
+#
+#     #主要提供模型信息（比如 User 模型 说明提交的是user模型的数据），而不是直接查询数据
+#     queryset = User.objects.all()
+#     #使用自定义的序列化器
+#     serializer_class = UserRegisterSerializer
+#
+#     #如果需要更精确的范围可以重写get_queryset方法
+#     def get_queryset(self):
+#         return User.objects.filter(is_active=True)
+#
+#     #如果需要在创建前添加条件筛选可以重写perform_create方法
+#     # def perform_create(self, serializer):
+#     #     if User.objects.filter(mobile=serializer.validated_data['mobile']).exists():
+#     #         raise ValidationError("手机号已注册")
+#     #     serializer.save()
