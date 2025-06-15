@@ -15,7 +15,8 @@
       </label>
       <p>忘记密码</p>
     </div>
-    <button class="login_btn" @click="show_captcha">登录</button>
+    <!--    <button class="login_btn" @click="show_captcha">登录</button>  因为防水墙过期所以弃用该方法-->
+    <button class="login_btn" @click="loginhandeler">登录</button>
     <p class="go_login" >没有账号 <span><router-link to="/register">注册</router-link></span></p>
   </div>
   <div class="inp" v-show="user.login_type==1">
@@ -43,20 +44,20 @@ const emit = defineEmits(["successhandle",])
 //引入vuex的store记录登录信息
 const store=useStore()
 
-//显示登录验证码
-const show_captcha=()=>{
-    var captcha1 = new TencentCaptcha(settings.captcha_app_id, (res)=>{
-      // 接收验证结果的回调函数
-      /* res（验证成功） = {ret: 0, ticket: "String", randstr: "String"}
-         res（客户端出现异常错误 仍返回可用票据） = {ret: 0, ticket: "String", randstr: "String", errorCode: Number, errorMessage: "String"}
-         res（用户主动关闭验证码）= {ret: 2}
-      */
-      console.log(res);
-      // 调用登录处理
-      loginhandeler(res);
-    });
-  captcha1.show(); // 显示验证码
-}
+//显示登录验证码 防水墙过期 开启该功能需要调用该函数并且在后端视图中嵌入集成功能
+// const show_captcha=()=>{
+//     var captcha1 = new TencentCaptcha(settings.captcha_app_id, (res)=>{
+//       // 接收验证结果的回调函数
+//       /* res（验证成功） = {ret: 0, ticket: "String", randstr: "String"}
+//          res（客户端出现异常错误 仍返回可用票据） = {ret: 0, ticket: "String", randstr: "String", errorCode: Number, errorMessage: "String"}
+//          res（用户主动关闭验证码）= {ret: 2}
+//       */
+//       console.log(res);
+//       // 调用登录处理
+//       loginhandeler(res);
+//     });
+//   captcha1.show(); // 显示验证码
+// }
 
 
 //前端进行提交验证

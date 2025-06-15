@@ -45,12 +45,16 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     re_password = serializers.CharField(required=True, write_only=True)
     sms_code = serializers.CharField(min_length=4, max_length=6, required=True, write_only=True)
     token = serializers.CharField(read_only=True)
+    #集成防水墙功能
+    #ticket = serializers.CharField(required=True, write_only=True, help_text="滑块验证码的临时凭证")
+    #randstr = serializers.CharField(required=True, write_only=True, help_text="滑块验证码的随机字符串")
 
 
     class Meta:
         model = User
         # fields = '__all__'
         fields = ['mobile','password','re_password','sms_code','token']
+        #fields = ["mobile", "password", "re_password", "sms_code", "token", "ticket", "randstr"] #启用防水墙时用这个
         extra_kwargs = {
             'mobile':{'required':True,'write_only':True},
             'password':{'required':True,'write_only':True},
@@ -78,15 +82,15 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(detail="密码和确认密码不一致！", code="password")
 
         # todo 验证防水墙验证码
-        api = TencentCloudAPI()
-        result = api.captcha(
-            data.get("ticket"),
-            data.get("randstr"),
-            self.context['request']._request.META.get("REMOTE_ADDR"),  # 客户端IP
-        )
-
-        if not result:
-            raise serializers.ValidationError(detail="滑块验证码校验失败！")
+        # api = TencentCloudAPI()
+        # result = api.captcha(
+        #     data.get("ticket"),
+        #     data.get("randstr"),
+        #     self.context['request']._request.META.get("REMOTE_ADDR"),  # 客户端IP
+        # )
+        #
+        # if not result:
+        #     raise serializers.ValidationError(detail="滑块验证码校验失败！")
 
         # todo 验证短信验证码
 

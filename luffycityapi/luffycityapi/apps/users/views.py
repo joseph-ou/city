@@ -18,29 +18,33 @@ from .serializers import UserRegisterSerializer
 
 #自定义载荷的jwt 同时自定义post方法集成腾讯验证码功能
 class CustomTokenObtainPairView(TokenObtainPairView):
-    """用户登录视图 """
+    """用户登录视图 post分为集成验证码功能和不集成的"""
     serializer_class = CustomTokenObtainPairSerializer
 
 
-    def post(self, request, *args, **kwargs):
-        # 校验用户操作验证码成功以后的ticket临时票据
-        try:
-            api = TencentCloudAPI()
-            result = api.captcha(
-                request.data.get("ticket"),
-                request.data.get("randstr"),
-                request._request.META.get("REMOTE_ADDR"),
-            )
-            if result:
-                # 验证通过
-                print("验证通过")
-                # 登录实现代码，调用父类实现的登录视图方法
-                return super().post(request, *args, **kwargs)
-            else:
-                # 如果返回值不是True，则表示验证失败
-                raise TencentCloudSDKException
-        except TencentCloudSDKException as err:
-            return Response({"errmsg": "验证码校验失败！"}, status=status.HTTP_400_BAD_REQUEST)
+    # def post(self, request, *args, **kwargs):
+    #     # 校验用户操作验证码成功以后的ticket临时票据
+    #     try:
+    #         api = TencentCloudAPI()
+    #         result = api.captcha(
+    #             request.data.get("ticket"),
+    #             request.data.get("randstr"),
+    #             request._request.META.get("REMOTE_ADDR"),
+    #         )
+    #         if result:
+    #             # 验证通过
+    #             print("验证通过")
+    #             # 登录实现代码，调用父类实现的登录视图方法
+    #             return super().post(request, *args, **kwargs)
+    #         else:
+    #             # 如果返回值不是True，则表示验证失败
+    #             raise TencentCloudSDKException
+    #     except TencentCloudSDKException as err:
+    #         return Response({"errmsg": "验证码校验失败！"}, status=status.HTTP_400_BAD_REQUEST)
+
+    def post(self,request,*args,**kwargs):
+        return super().post(request,*args,**kwargs)
+
 
 
 #手机号注册验证
@@ -64,8 +68,22 @@ class UserRegisterAPIView(APIView):
     def post(self,request,*args,**kwargs):
         serializer = UserRegisterSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            user=serializer.save()
+            # print("register success")
+            # print(serializer.validated_data)
+
+            #生成token(access) 实现注册后自动登录的状态
+            access=serializer.get_token(user)
+
+            response_data ={
+                'access' : access,
+                'mobile' : serializer.validated_data['mobile'],
+                'password' : serializer.validated_data['password'],
+                're_password': serializer.validated_data['re_password'],
+                'sms_code': serializer.validated_data['sms_code'],
+            }
+
+            return Response(response_data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # class UserRegisterAPIView(CreateAPIView):

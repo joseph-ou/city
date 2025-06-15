@@ -18,7 +18,8 @@
           <input type="password" v-model="user.re_password" placeholder="确认密码" class="user">
           <input type="code" v-model="user.code" placeholder="验证码" class="code">
           <el-button id="get_code" type="primary">获取验证码</el-button>
-          <button class="login_btn" @click="show_captcha">注册</button>
+<!--          <button class="login_btn" @click="show_captcha">注册</button> 防水墙过期-->
+          <button class="login_btn" @click="registerhandler">注册</button>
 
           <p class="go_login">已有账号 <router-link to="/login">跳转至登录</router-link></p>
 
@@ -37,7 +38,7 @@
 <script setup>
 
 import {reactive, defineEmits,watch} from "vue"
-
+import router from "@/router/index.js";
 import {useStore} from "vuex"
 import user from '@/api/user.js'
 import {ElMessage} from "element-plus";//发送提示框
@@ -71,20 +72,20 @@ watch(()=>user.mobile,(mobile,prev_mobile)=>{
 
 });
 
-// 显示登录验证码
-const show_captcha = ()=>{
-  // 直接生成一个验证码对象
-  let  captcha1 = new TencentCaptcha(settings.captcha_app_id, (res)=>{
-    // 验证码通过验证以后的回调方法
-    if(res && res.ret === 0){
-      // 验证通过，发送登录请求
-      registerhandler(res)
-    }
-  });
-
-  // 显示验证码
-  captcha1.show();
-}
+// 显示登录验证码 防水墙过期 开启该功能需要调用该函数并且在后端视图中嵌入集成功能
+// const show_captcha = ()=>{
+//   // 直接生成一个验证码对象
+//   let  captcha1 = new TencentCaptcha(settings.captcha_app_id, (res)=>{
+//     // 验证码通过验证以后的回调方法
+//     if(res && res.ret === 0){
+//       // 验证通过，发送登录请求
+//       registerhandler(res)
+//     }
+//   });
+//
+//   // 显示验证码
+//   captcha1.show();
+// }
 
 const registerhandler = (res)=> {
   // 注册处理
@@ -109,6 +110,8 @@ const registerhandler = (res)=> {
     ticket: res.ticket,
     randstr: res.randstr,
   }).then(response=>{
+    console.log(response)
+
     // 保存token，并根据用户的选择，是否记住密码
     localStorage.removeItem("access");
     sessionStorage.removeItem("access");
