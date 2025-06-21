@@ -102,3 +102,46 @@ class UserRegisterAPIView(APIView):
 #     #     if User.objects.filter(mobile=serializer.validated_data['mobile']).exists():
 #     #         raise ValidationError("手机号已注册")
 #     #     serializer.save()
+
+
+#手机号短信登录
+import random
+from django_redis import get_redis_connection
+from django.conf import settings
+from ronglianyunapi import send_sms
+
+class SMSAPIView(APIView):
+    '''SMS短信登录接口'''
+    #处理登录
+    def post(self,request,mobile,*args,**kwargs):
+        '''发送短信验证码'''
+        redis=get_redis_connection('sms_code')
+        # 判断手机短信是否处于发送冷却中[60秒只能发送一条]
+        interval = redis.ttl(f"interval_{mobile}")  # 通过ttl方法可以获取保存在redis中的变量的剩余有效期
+        if interval != -2:
+            return Response(
+                {"errmsg": f"短信发送过于频繁，请{interval}秒后再次点击获取!"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # 基于随机数生成短信验证码
+        # code = "%06d" % random.randint(0, 999999)
+        #f-string 中的 :06d 是一个格式说明符，表示将数字格式化为 6 位整数，不足 6 位时前面补 0。效果与旧方法 "%06d" 相同。
+        code=f"{random.randint(0,999999):06d}"
+        #获取短信有效时间
+        time=settings.RONGLIANYUN.get('sms_expire')
+        #短信发送间隔
+        sms_interval=settings.RONGLIANYUN['sms_interval']
+
+        #调用第三方发送短信
+        send_sms(settings.RONGLIANYUN.get('reg_tid'),mobile,datas=(code,time//60))
+
+
+        #将code存储到redis里面
+        pipe=redis.pipeline()
+        pipe.multi()#开启事务
+        pipe.setex(f"sms_{mobile}",time,code)#setex添加了一个过期时间
+        pipe.setex(f"interval_{mobile}",sms_interval,'_') #记录发送时间并设置发送间隔
+        pipe.execute() #提交事务并把暂存在pipeline的数据一次性提交给redis
+
+        return Response({"msg": "sms_send success"}, status=status.HTTP_200_OK)
