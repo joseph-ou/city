@@ -113,7 +113,7 @@ from ronglianyunapi import send_sms
 class SMSAPIView(APIView):
     '''SMS短信登录接口'''
     #处理登录
-    def post(self,request,mobile,*args,**kwargs):
+    def get(self,request,mobile,):
         '''发送短信验证码'''
         redis=get_redis_connection('sms_code')
         # 判断手机短信是否处于发送冷却中[60秒只能发送一条]
@@ -127,7 +127,7 @@ class SMSAPIView(APIView):
         # 基于随机数生成短信验证码
         # code = "%06d" % random.randint(0, 999999)
         #f-string 中的 :06d 是一个格式说明符，表示将数字格式化为 6 位整数，不足 6 位时前面补 0。效果与旧方法 "%06d" 相同。
-        code=f"{random.randint(0,999999):06d}"
+        code=f"{random.randint(0,9999):04d}"
         #获取短信有效时间
         time=settings.RONGLIANYUN.get('sms_expire')
         #短信发送间隔

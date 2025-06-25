@@ -10,6 +10,10 @@ const user=reactive({
     mobile:'',//手机号 登录/注册用
     re_password:'',//再确认手机号 注册用
     code:'',//短信验证码
+    sms_btn_text:'获取验证码',
+    sms_interval:60,//短信发送冷却间隔
+    is_send:false,//短信发送状态
+    interval:null,//定时器标记
 
     login(res){
         //用户登录 发送axios请求
@@ -35,6 +39,10 @@ const user=reactive({
         data.sms_code = this.code
         // 用户注册请求
         return http.post("/users/register/", data)
+    },
+
+    get_sms_code(){
+        return http.get(`/users/sms/${this.mobile}`)
     }
 
 

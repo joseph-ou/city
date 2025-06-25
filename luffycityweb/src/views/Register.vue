@@ -17,7 +17,7 @@
           <input type="password" v-model="user.password" placeholder="登录密码" class="user">
           <input type="password" v-model="user.re_password" placeholder="确认密码" class="user">
           <input type="code" v-model="user.code" placeholder="验证码" class="code">
-          <el-button id="get_code" type="primary">获取验证码</el-button>
+          <el-button id="get_code" type="primary" @click="send_sms">{{user.sms_btn_text}}</el-button>
 <!--          <button class="login_btn" @click="show_captcha">注册</button> 防水墙过期-->
           <button class="login_btn" @click="registerhandler">注册</button>
 
@@ -133,6 +133,65 @@ const registerhandler = (res)=> {
     // 路由跳转到首页
     router.push("/");
 
+
+  })
+}
+
+
+//发送短信
+const send_sms=()=>{
+  if (!/^1[3-9]\d{9}$/.test(user.mobile)){
+    ElMessage.error('手机格式错误')
+    return false
+  }
+
+  //判断短信发送冷却时间
+  if(user.is_send){
+    ElMessage.error('短信发送过于频繁')
+    return false
+  }
+
+  let time=user.sms_interval;
+
+  //发送短信请求
+  user.get_sms_code().then(res=>{
+    ElMessage.success('发送成功，请注意您的手机')
+
+    //发送后进入冷却状态
+    user.is_send=true;
+
+    //冷却倒计时
+    clearInterval(user.interval);//清除旧计时器
+    user.interval=setInterval(()=>{
+      if(time<1){
+        //退出短信发送冷却状态
+        user.is_send=false
+        user.sms_btn_text='获取验证码'
+        clearInterval(user.interval); // 倒计时结束时停止计时器
+      }else{
+        time-=1;
+        user.sms_btn_text=`${time}后重新发送`;
+      }
+    },1000)
+
+
+
+  }).catch(err => {
+    ElMessage.error(err?.response?.data?.msg);
+    time = err?.response?.data?.interval;
+    // 冷却倒计时
+    clearInterval(user.interval);
+    user.interval = setInterval(()=>{
+      if(time<1){
+        // 退出短信发送的冷却状态
+        user.is_send = false
+        user.sms_btn_text = "点击获取验证码"
+        clearInterval(user.interval); // 倒计时结束时停止计时器
+      }else{
+        time-=1;
+        user.sms_btn_text = `${time}秒后重新获取`;
+      }
+    }, 1000)
 
   })
 }
