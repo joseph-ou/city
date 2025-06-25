@@ -8,6 +8,7 @@ from .models import User
 from luffycityapi.utils.tencentcloudapi import TencentCloudAPI, TencentCloudSDKException #添加验证腾讯云的验证码ticket和randstr
 
 import constants
+from django_redis import get_redis_connection
 
 #自定义jwt载荷 在payload里面添加自己所需要的内容
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -93,7 +94,19 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         #     raise serializers.ValidationError(detail="滑块验证码校验失败！")
 
         # todo 验证短信验证码
+        redis=get_redis_connection('sms_code')
+        mobile=data.get('mobile')
+        code = redis.get(f"sms_{mobile}")
+        if code is None:
+            '''获取不到验证码 说明验证码过期或者失效'''
+            raise serializers.ValidationError(detail="短信验证码失效或过期", code="sms_code")
 
+        # 从redis提取的数据，字符串都是bytes类型，所以decode
+        if code.decode() != data.get("sms_code"):
+            raise serializers.ValidationError(detail="短信验证码错误！", code="sms_code")
+        print(f"code={code.decode()}, sms_code={data.get('sms_code')}")
+        # 删除掉redis中的短信，后续不管用户是否注册成功，至少当前这条短信验证码已经没有用处了
+        redis.delete(f"sms_{mobile}")
 
         return data
 
