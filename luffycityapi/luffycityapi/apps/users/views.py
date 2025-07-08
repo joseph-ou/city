@@ -108,7 +108,9 @@ class UserRegisterAPIView(APIView):
 import random
 from django_redis import get_redis_connection
 from django.conf import settings
-from ronglianyunapi import send_sms
+
+# from ronglianyunapi import send_sms #使用容联云发送
+from mycelery.sms.tasks import send_sms #用celery 导入调用异步任务
 
 class SMSAPIView(APIView):
     '''SMS短信登录接口'''
@@ -134,7 +136,11 @@ class SMSAPIView(APIView):
         sms_interval=settings.RONGLIANYUN['sms_interval']
 
         #调用第三方发送短信
-        send_sms(settings.RONGLIANYUN.get('reg_tid'),mobile,datas=(code,time//60))
+        # send_sms(settings.RONGLIANYUN.get('reg_tid'),mobile,datas=(code,time//60))
+
+        #使用celery发送异步任务
+        send_sms.delay(settings.RONGLIANYUN.get('reg_tid'),mobile,datas=(code,time//60))
+
 
 
         #将code存储到redis里面
