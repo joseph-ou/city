@@ -110,7 +110,8 @@ from django_redis import get_redis_connection
 from django.conf import settings
 
 # from ronglianyunapi import send_sms #使用容联云发送
-from mycelery.sms.tasks import send_sms #用celery 导入调用异步任务
+# from mycelery.sms.tasks import send_sms #用celery作为单独项目 导入调用异步任务
+from .tasks import send_sms #celery作为第三方模块引入
 
 class SMSAPIView(APIView):
     '''SMS短信登录接口'''
