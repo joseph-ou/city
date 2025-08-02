@@ -24,8 +24,13 @@ from django.views.static import serve#静态文件代理访问模块
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+
+    # path('ckeditor/', include('ckeditor_uploader.urls')), #z这是旧版的ckeditor4
+    path('ckeditor5/', include('django_ckeditor_5.urls')), # 确保添加了这一行
+
     re_path(r'uploads/(?P<path>.*)', serve, {"document_root": settings.MEDIA_ROOT}),
 
     path('home/',include("home.urls")),
     path('users/',include("users.urls")),
+    path('courses/',include('courses.urls')),
 ]
