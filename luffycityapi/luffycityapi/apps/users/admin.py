@@ -8,7 +8,10 @@ from .models import User
 
 
 class UserModelAdmin(UserAdmin):
-    list_display = ['id','mobile','credit','money']
+    list_display = ['id','mobile','email','nickname','credit','money',]
+
+    # 默认排序字段
+    ordering = ["id"]
 
 
 admin.site.register(User, UserModelAdmin)

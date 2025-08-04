@@ -1,4 +1,6 @@
 # from django.db import models
+from stdimage import StdImageField #图片缩略图
+from django.utils.safestring import mark_safe
 
 # from luffycityapi.utils.models import BaseModel,models
 from models import BaseModel,models
@@ -65,7 +67,13 @@ class Course(BaseModel):
         (1, '下线'),
         (2, '预上线'),
     )
-    course_cover = models.ImageField(upload_to="course/cover", max_length=255, verbose_name="封面图片", blank=True, null=True)
+    # course_cover = models.ImageField(upload_to="course/cover", max_length=255, verbose_name="封面图片", blank=True, null=True)
+    course_cover=StdImageField(variations={
+        'thumb_1080x608': (1080, 608),  # 高清图
+        'thumb_540x304': (540, 304),  # 中等比例,
+        'thumb_108x61': (108, 61, True),  # 小图(第三个参数表示保持图片质量),
+    },upload_to="course/cover", max_length=255, verbose_name="封面图片", blank=True, null=True)
+
     course_video = models.FileField(upload_to="course/video", max_length=255, verbose_name="封面视频", blank=True, null=True)
     course_type = models.SmallIntegerField(choices=course_type,default=0, verbose_name="付费类型")
     level = models.SmallIntegerField(choices=level_choices, default=1, verbose_name="难度等级")
@@ -93,6 +101,33 @@ class Course(BaseModel):
     def __str__(self):
         return "%s" % self.name
 
+    def course_cover_small(self):
+        if self.course_cover:
+            return mark_safe(f'<img style="border-radius: 0%;" src="{self.course_cover.thumb_108x61.url}">')
+        return ""
+
+    course_cover_small.short_description = "封面图片(108x61)"
+    course_cover_small.allow_tags = True
+    course_cover_small.admin_order_field = "course_cover"
+
+    def course_cover_medium(self):
+        if self.course_cover:
+            return mark_safe(f'<img style="border-radius: 0%;" src="{self.course_cover.thumb_540x304.url}">')
+        return ""
+
+    course_cover_medium.short_description = "封面图片(540x304)"
+    course_cover_medium.allow_tags = True
+    course_cover_medium.admin_order_field = "course_cover"
+
+    def course_cover_large(self):
+        if self.course_cover:
+            return mark_safe(f'<img style="border-radius: 0%;" src="{self.course_cover.thumb_1080x608.url}">')
+        return ""
+
+    course_cover_large.short_description = "封面图片(1080x608)"
+    course_cover_large.allow_tags = True
+    course_cover_large.admin_order_field = "course_cover"
+
 class Teacher(BaseModel):
     role_choices = (
         (0, '讲师'),
@@ -103,7 +138,13 @@ class Teacher(BaseModel):
     role = models.SmallIntegerField(choices=role_choices, default=0, verbose_name="讲师身份")
     title = models.CharField(max_length=64, verbose_name="职位、职称")
     signature = models.CharField(max_length=255, blank=True, null=True, verbose_name="导师签名")
-    avatar = models.ImageField(upload_to="teacher", null=True, verbose_name="讲师头像")
+    # avatar = models.ImageField(upload_to="teacher", null=True, verbose_name="讲师头像")
+    avatar = StdImageField(variations={
+        'thumb_800x800': (800, 800),  # 'large': (800, 800),
+        'thumb_400x400': (400, 400),  # 'medium': (400, 400),
+        'thumb_50x50': (50, 50, True),  # 'small': (50, 50, True),
+    }, delete_orphans=True, upload_to="teacher", null=True, verbose_name="讲师头像")
+
     brief = CKEditor5Field(max_length=1024, verbose_name="讲师描述")
 
     class Meta:
@@ -113,6 +154,33 @@ class Teacher(BaseModel):
 
     def __str__(self):
         return "%s" % self.name
+
+    def avatar_small(self):
+        if self.avatar:
+            return mark_safe(f'<img style="border-radius: 100%;" src="{self.avatar.thumb_50x50.url}">')
+        return ""
+
+    avatar_small.short_description = "头像信息(50x50)"
+    avatar_small.allow_tags = True
+    avatar_small.admin_order_field = "avatar"
+
+    def avatar_medium(self):
+        if self.avatar:
+            return mark_safe(f'<img style="border-radius: 100%;" src="{self.avatar.thumb_400x400.url}">')
+        return ""
+
+    avatar_medium.short_description = "头像信息(400x400)"
+    avatar_medium.allow_tags = True
+    avatar_medium.admin_order_field = "avatar"
+
+    def avatar_large(self):
+        if self.avatar:
+            return mark_safe(f'<img style="border-radius: 100%;" src="{self.avatar.thumb_800x800.url}">')
+        return ""
+
+    avatar_large.short_description = "头像信息(800x800)"
+    avatar_large.allow_tags = True
+    avatar_large.admin_order_field = "avatar"
 
 class CourseChapter(BaseModel):
     """课程章节"""
